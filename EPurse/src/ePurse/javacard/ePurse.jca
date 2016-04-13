@@ -1,0 +1,179 @@
+// converted by version 1.3
+// on Wed Apr 13 13:55:38 IST 2016
+
+.package ePurse {
+	.aid 0x1:0x2:0x3:0x4:0x5:0x6:0x7:0x8:0x9:0x0;
+	.version 1.0;
+
+	.imports {
+		0xA0:0x0:0x0:0x0:0x62:0x1:0x1 1.3;		//javacard/framework
+		0xA0:0x0:0x0:0x0:0x62:0x0:0x1 1.0;		//java/lang
+	}
+
+	.applet {
+		0x1:0x2:0x3:0x4:0x5:0x6:0x7:0x8:0x9:0x0:0x0 EPurse;
+	}
+
+	.constantPool {
+		// 0
+		instanceFieldRef short EPurse/balance;
+		// 1
+		classRef EPurse;
+		// 2
+		staticMethodRef 0.3.0()V;		// javacard/framework/Applet.<init>()V
+		// 3
+		staticMethodRef EPurse/<init>()V;
+		// 4
+		virtualMethodRef 0.3.1()V;		// register()V
+		// 5
+		virtualMethodRef 0.10.1()[B;		// getBuffer()[B
+		// 6
+		virtualMethodRef 0.3.3()Z;		// selectingApplet()Z
+		// 7
+		staticMethodRef 0.7.1(S)V;		// javacard/framework/ISOException.throwIt(S)V
+		// 8
+		staticMethodRef 0.16.6([BSS)S;		// javacard/framework/Util.setShort([BSS)S
+		// 9
+		virtualMethodRef 0.10.8(SS)V;		// setOutgoingAndSend(SS)V
+		// 10
+		virtualMethodRef 0.10.6()S;		// setIncomingAndReceive()S
+		// 11
+		staticMethodRef 0.16.4([BS)S;		// javacard/framework/Util.getShort([BS)S
+	}
+
+	.class public EPurse 0 extends 0.3 {		// extends javacard/framework/Applet
+
+		.fields {
+			private short balance 0;		// S
+			public static final byte EPURSE_CLA = -96;		// B
+			public static final byte EPURSE_BAL = -80;		// B
+			public static final byte EPURSE_ADD = -78;		// B
+			public static final byte EPURSE_SUB = -76;		// B
+		}
+
+		.publicMethodTable 7 {
+			equals(Ljava/lang/Object;)Z;
+			register()V;
+			register([BSB)V;
+			selectingApplet()Z;
+			deselect()V;
+			getShareableInterfaceObject(Ljavacard/framework/AID;B)Ljavacard/framework/Shareable;;
+			select()Z;
+			process(Ljavacard/framework/APDU;)V;
+		}
+
+		.packageMethodTable 0 {
+		}
+
+		.method public static install([BSB)V 0 {
+			.stack 1;
+			.locals 0;
+
+				L0:	new 1;		// ePurse/EPurse
+					invokespecial 3;		// ePurse/EPurse.<init>()V
+					return;
+		}
+
+		.method protected <init>()V 1 {
+			.stack 2;
+			.locals 0;
+
+				L0:	aload_0;
+					invokespecial 2;		// javacard/framework/Applet.<init>()V
+					aload_0;
+					sconst_0;
+					putfield_s 0;		// short ePurse/EPurse.balance
+					aload_0;
+					invokevirtual 4;		// register()V
+					return;
+		}
+
+		.method public process(Ljavacard/framework/APDU;)V 7 {
+			.stack 3;
+			.locals 2;
+
+			.descriptor	Ljavacard/framework/APDU;	0.10;
+
+				L0:	aload_1;
+					invokevirtual 5;		// getBuffer()[B
+					astore_2;
+					aload_0;
+					invokevirtual 6;		// selectingApplet()Z
+					ifeq L2;
+				L1:	return;
+				L2:	aload_2;
+					sconst_0;
+					baload;
+					bspush -96;
+					if_scmpeq L4;
+				L3:	sspush 28160;
+					invokestatic 7;		// javacard/framework/ISOException.throwIt(S)V
+				L4:	sconst_0;
+					sstore_3;
+					aload_2;
+					sconst_1;
+					baload;
+					stableswitch L14 -80 -76 L5 L14 L6 L14 L10;
+				L5:	aload_2;
+					sconst_0;
+					getfield_s_this 0;		// short ePurse/EPurse.balance
+					invokestatic 8;		// javacard/framework/Util.setShort([BSS)S
+					pop;
+					aload_1;
+					sconst_0;
+					sconst_2;
+					invokevirtual 9;		// setOutgoingAndSend(SS)V
+					goto L15;
+				L6:	aload_1;
+					invokevirtual 10;		// setIncomingAndReceive()S
+					pop;
+					aload_2;
+					sconst_5;
+					invokestatic 11;		// javacard/framework/Util.getShort([BS)S
+					sstore_3;
+					sload_3;
+					ifle L8;
+				L7:	getfield_s_this 0;		// short ePurse/EPurse.balance
+					sload_3;
+					sadd;
+					ifgt L9;
+				L8:	sspush 27264;
+					invokestatic 7;		// javacard/framework/ISOException.throwIt(S)V
+					goto L15;
+				L9:	aload_0;
+					dup;
+					getfield_s 0;		// short ePurse/EPurse.balance
+					sload_3;
+					sadd;
+					putfield_s 0;		// short ePurse/EPurse.balance
+					goto L15;
+				L10:	aload_1;
+					invokevirtual 10;		// setIncomingAndReceive()S
+					pop;
+					aload_2;
+					sconst_5;
+					invokestatic 11;		// javacard/framework/Util.getShort([BS)S
+					sstore_3;
+					sload_3;
+					ifle L12;
+				L11:	getfield_s_this 0;		// short ePurse/EPurse.balance
+					sload_3;
+					if_scmpge L13;
+				L12:	sspush 27264;
+					invokestatic 7;		// javacard/framework/ISOException.throwIt(S)V
+					goto L15;
+				L13:	aload_0;
+					dup;
+					getfield_s 0;		// short ePurse/EPurse.balance
+					sload_3;
+					ssub;
+					putfield_s 0;		// short ePurse/EPurse.balance
+					goto L15;
+				L14:	sspush 27904;
+					invokestatic 7;		// javacard/framework/ISOException.throwIt(S)V
+				L15:	return;
+		}
+
+	}
+
+}
