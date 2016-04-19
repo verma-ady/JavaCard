@@ -28,6 +28,7 @@ public class Encrypt extends Applet {
     public static final byte E_INP_D = (byte) 0xB3;
     public static final byte E_OUT_D = (byte) 0xB4;
     boolean isSet = false;
+    private Cipher symCipher;
     short data = (short) 0;
     
     /**
@@ -48,6 +49,8 @@ public class Encrypt extends Applet {
      * Only this class's install method should create the applet object.
      */
     protected Encrypt() {
+        symCipher = Cipher.getInstance(Cipher.ALG_AES_BLOCK_128_CBC_NOPAD, false); 
+        myKey = (AESKey) KeyBuilder.buildKey(KeyBuilder.TYPE_AES_TRANSIENT_RESET, KeyBuilder.LENGTH_AES_128, false);
         register();
     }
 
@@ -91,38 +94,34 @@ public class Encrypt extends Applet {
                 Util.setShort(buffer, (short)0, data);
                 apdu.setOutgoingAndSend((short)0, (short)2);
                 break;
-            case E_ENCRYPT_D:
+            case E_ENCRYPT_D: 
                 RandomData randomData = RandomData.getInstance(RandomData.ALG_PSEUDO_RANDOM);
                 byte[] random = JCSystem.makeTransientByteArray((short)16, JCSystem.CLEAR_ON_RESET);
                 randomData.generateData(random, (short)0, (short)random.length);
-
-                myKey = (AESKey) KeyBuilder.buildKey(KeyBuilder.TYPE_AES, KeyBuilder.LENGTH_AES_128, false);
                 myKey.setKey(random, (short)0);
-                
+
                 if(!isSet) ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
-                
-                Cipher symCipher = Cipher.getInstance(Cipher.ALG_AES_BLOCK_128_CBC_NOPAD, false); 
                 symCipher.init(myKey, Cipher.MODE_ENCRYPT);
-                byte[] encryptedC= new byte[256]; //128 bits = 16 bytes
-                byte[] dataB = new byte[2];
-                Util.setShort(dataB, (short)0, data);
-                short le = apdu.setOutgoing();
                 
+                byte[] dataB = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 
+                                0x0B, 0x0C, 0x0D, 0x0E, 0x0F};
+                
+                
+                short le = apdu.setOutgoing();
+
                 if(!myKey.isInitialized())
                         ISOException.throwIt(ISO7816.SW_CONDITIONS_NOT_SATISFIED);
                 
                 try{
-                    
-                    if( le != symCipher.doFinal(dataB, (short)0, (short)dataB.length, encryptedC, (short)0))
+                    if( le != symCipher.doFinal(dataB, (short)0, (short)dataB.length, buffer, (short)0))
                         ISOException.throwIt(ISO7816.SW_WRONG_DATA);
-                } catch(CryptoException exception ){
-//                    ISOException.throwIt((short)2);
-                    ISOException.throwIt(exception.getReason());
+                } catch(Exception exception ) {
+//                    ISOException.throwIt(exception.getReason());
+                    ISOException.throwIt((short)16);
                 }
-                
-                
-                Util.arrayCopy( encryptedC, (short)0, buffer, (short)0, (short)encryptedC.length );
-                apdu.setOutgoingAndSend((short)0, (short)encryptedC.length);
+                apdu.setOutgoingLength(le);
+                apdu.sendBytes((short)0, le);
+//                ISOException.throwIt((short)32);
                 break;
             default : ISOException.throwIt(ISO7816.SW_INS_NOT_SUPPORTED);
         }//switch
